@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="post" action="{% url 'student_dashboard' %}">
+    {% csrf_token %}
+    
+    <b>USN</b><input type="text" id="usn" name="usn" value="{{ usn }}" readonly><br>   
+    <b>Sem</b><input type="number" id="sem" name="sem" value="{{ sem }}"><br>    
+    <b>CIE</b><input type="number" id="cie" name="cie" value="{{ cie }}"><br>
+    <input type="submit" value="Submit" class="button primary">
+</form>
+
+<h2>Report Details</h2>
+    <table border="1">
+        <tr>
+            <th>Sub Code</th>
+            <th>CIE</th>
+            <th>USN</th>
+            <th>Marks</th>
+            <th>Attendance</th>
+        </tr>
+        {% for sub_code, name, mark, attendance in reports %}
+        <tr>
+            <td>{{ sub_code }}</td>
+            <td>{{ cie }}</td>
+            <td>{{ usn }}</td>
+            <td>{{ mark }}</td>
+            <td>{{ attendance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

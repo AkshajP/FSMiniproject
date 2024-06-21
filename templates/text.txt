@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>$Title$</h2>
+<p>$Content$</p>
+{% endblock %}
+
+<form action="{% url 'search_by_cell' %}" method="get"> <!--change url-->
