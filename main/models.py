@@ -34,4 +34,4 @@ class Marks(models.Model):
     attendance = models.CharField(max_length=10)
     
     def __str__(self):
-        return self.usn
+        return f"Student: {self.usn.usn}, Subject: {self.sub_code.sub_name}, Marks: {self.marks}"

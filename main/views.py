@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 from .models import Students
 from .models import Teachers
 from .models import Subject
@@ -7,6 +9,15 @@ from .models import Marks
 # Create your views here.
 def index(request):
     return render(request, "base.html")
+
+def render_to_pdf(template_src, context_dict):
+    template = render_to_string(template_src, context_dict)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="progress_report.pdf"'
+    pisa_status = pisa.CreatePDF(template, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + str(pisa_status.err) + '</pre>')
+    return response
 
 def student_dashboard(request):
     if request.method == "POST":
@@ -30,6 +41,10 @@ def student_dashboard(request):
             "cie": cie,
             "reports": report,
         }
-        return render(request, "main/test_page.html", data)
+        
+        if 'generate_pdf' in request.POST:
+            return render_to_pdf('main/progress_report_pdf.html', data)
+        
+        return render(request, "main/progress_report_student.html", data)
     
     return render(request, "main/student_dashboard.html")
