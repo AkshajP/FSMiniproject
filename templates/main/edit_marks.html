@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="post" action="{% url 'teacher_dashboard' %}">
+    {% csrf_token %}
+    
+    <b>USN</b><input type="text" id="usn" name="usn" value="{{ usn }}"><br>   
+    <b>Sem</b><input type="number" id="sem" name="sem" value="{{ sem }}"><br>    
+    <b>CIE</b><input type="number" id="cie" name="cie" value="{{ cie }}"><br>
+    <input name="action" value="edit" hidden>
+    <input type="submit" value="Submit" class="button primary">
+    <button type="submit" name="generate_pdf">Generate PDF</button>
+</form>
+
+<h2>Report Details</h2>
+<form action= "/teacher_dashboard/edit_marks/" method="post">
+    {% csrf_token %}
+    <input name="usn" value="{{ usn }}" hidden >
+    <input name="sem" value="{{ sem }}" hidden>
+    <input name="cie" value="{{ cie }}" hidden>
+    <input name="action" value="edit" hidden>
+    <table border="1">
+        <tr>
+            <th>Sub Code</th>
+            <th>Subject Name</th>            
+            <th>Marks</th>
+            <th>Attendance</th>
+        </tr>
+        {% for sub_code, name, mark, attendance, id in reports %}
+        <tr>
+            <td>{{ sub_code }}</td>
+            <input name="sub_code_{{ id }}" value="{{ sub_code }}" hidden>
+            <td>{{ name }}</td>
+            <td><input type="number" name="marks_{{ sub_code }}" value="{{ mark }}"></td>
+            <td><input type="text" name="attendance_{{ sub_code }}" value="{{ attendance }}"></td>
+        </tr>
+        {% endfor %}
+    </table>
+<input type="submit">
+</form>
+
+{% endblock %}

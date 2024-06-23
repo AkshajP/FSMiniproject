@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<br>
+
+<form action="/teacher_dashboard/" method="post">
+    {% csrf_token %}
+    
+    <b>USN:</b><input type="text" name="usn" placeholder="1RF21CS001" required /><br>
+    <b>Sem:</b><input type="number" name="sem" placeholder="(1-8)" min="1" max="8" required/><br>
+    <b>CIE:</b><input type="number" name="cie" placeholder="(1-3)" min="1" max="3" required/><br> 
+
+    <button type="submit" name="action" value="add" class="button">Add Marks</button>
+    <button type="submit" name="action" value="edit" class="button">Edit Marks</button>
+    <button type="submit" name="action" value="view" class="button">View Marks</button>
+        
+    
+</form>
+{% endblock %}
+
+
