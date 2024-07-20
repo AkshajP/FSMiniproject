@@ -1,14 +1,13 @@
-from django.shortcuts import render,HttpResponse, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
-from .models import Students
-from .models import Teachers
-from .models import Subject
-from .models import Marks
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.contrib.auth.models import User
+
+from .models import Student, Marks, CIE, Semester
 
 # Create your views here.
-def index(request):
-    return render(request, "base.html")
 
 def render_to_pdf(template_src, context_dict):
     template = render_to_string(template_src, context_dict)
@@ -19,109 +18,173 @@ def render_to_pdf(template_src, context_dict):
         return HttpResponse('We had some errors <pre>' + str(pisa_status.err) + '</pre>')
     return response
 
-def student_dashboard(request):
-    if request.method == "POST":
-        usn = request.POST["usn"]
-        sem = request.POST["sem"]
-        cie = request.POST["cie"]
-        
-        student = Students.objects.get(usn=usn)
-        marks = Marks.objects.filter(usn=student.id, cie=cie)
-        
-        report = list()
-        for mark in marks:
-            subject = Subject.objects.get(id=mark.sub_code.id)
-            subject_mark = mark.marks
-            subject_attendence = mark.attendance
-            report.append((subject.sub_code, subject.sub_name, subject_mark, subject_attendence))
-        
-        data = {
-            "usn": usn,
-            "sem": sem,
-            "cie": cie,
-            "reports": report,
-        }
-        
-        if 'generate_pdf' in request.POST:
-            counsellor = Teachers.objects.get(id=student.counsellor_id)
-            data["counsellor"] = counsellor
-            return render_to_pdf('main/progress_report_pdf.html', data)
-        
-        return render(request, "main/progress_report_student.html", data)
-    
-    return render(request, "main/student_dashboard.html")
+def index(request):
+    return render(request, "index.html")
 
-def teacher_dashboard(request):
-    if request.method == "POST" or "old_page" in request.session:
-        if "old_page" in request.session:
-            old_data = request.session["old_page"]
-            usn = old_data["usn"]
-            sem = old_data["sem"]
-            cie = old_data["cie"]
-            action = old_data['action']
-            del request.session["old_page"]
-        else:
-            usn = request.POST["usn"]
-            sem = request.POST["sem"]
-            cie = request.POST["cie"]
-            action = request.POST['action']
-        
-        student = Students.objects.get(usn=usn)
-        marks = Marks.objects.filter(usn=student.id, cie=cie)
-        
-        report = list()
-        i = 1
-        for mark in marks:
-            subject = Subject.objects.get(id=mark.sub_code.id)
-            subject_mark = mark.marks
-            subject_attendence = mark.attendance
-            report.append((subject.sub_code, subject.sub_name, subject_mark, subject_attendence, i))
-            i += 1
-        
-        data = {
-            "usn": usn,
-            "sem": sem,
-            "cie": cie,
-            "reports": report,
-        }
-        
-        if action == 'add':
-            return render(request, 'main/add_marks.html', data)
-        if action == 'edit':
-            return render(request, 'main/edit_marks.html', data)
-        if action == 'view':
-            return render(request, 'main/view_marks.html', data)
-    
-    
-    return render(request, "main/teacher_dashboard.html")
-
-def add_or_edit(request):
+def teacher(request):
     return render(request, "main/teacher_dashboard.html")
 
 def add_marks(request):
+    if request.method == "POST":
+        sem = int(request.POST["sem"])
+        cie = int(request.POST["cie"])
+        class_code = request.POST["class_code"]
+        class_students = Student.objects.filter(class_code=class_code)
+        students = []
+        for student in class_students:
+            students.append(User.objects.get(id=student.student.id))
+            
+        data = {
+            'cie': cie,
+            'sem': sem,
+            'sub_code': request.POST["sub_code"],
+            'students': zip(students, class_students),
+        }
+        return render(request, "main/enter_marks.html", data)
+        
+        
     return render(request, "main/add_marks.html")
 
-def edit_marks(request):
-    if request.method == "POST":
-        usn = request.POST["usn"]
-        next_page = {
-            "usn": usn,
-            "sem": request.POST["sem"],
-            "cie": request.POST["cie"],
-            "action": request.POST["action"],
-        }
-        for key in request.POST.keys():
-            if "sub_code" in key:
-                sub_code = request.POST[key]
-                mark = request.POST[f"marks_{request.POST[key]}"]
-                attendance = request.POST[f"attendance_{request.POST[key]}"]
-                
-                student = Students.objects.get(usn=usn)
-                subject = Subject.objects.get(sub_code=sub_code)
-                marks = Marks.objects.get(usn=student.id, sub_code=subject.id)
-                marks.marks = mark
-                marks.attendance = attendance
-                marks.save()
+def enter_marks(request):
+    sem_val = request.POST["sem"]
+    cie_val = request.POST["cie"]
+    sub_code_val = request.POST["sub_code"]
+    marks = []
+    for key in request.POST.keys():
+        if "marks" in key:
+            student = Student.objects.get(id=key[len("marks-"):])
+            attendance = request.POST[f"attendance-{key[len("marks-"):]}"]
+            marks.append((student, request.POST[key], attendance))
+    
+    for mark in marks:
+        sem = Semester.objects.get_or_create(
+            sem=sem_val
+        )
+        cie = CIE.objects.get_or_create(
+            sem=sem[0],
+            cie=cie_val,
+            sub_code=sub_code_val
+        )
+        mark_tup = Marks.objects.get_or_create(
+            student=mark[0],
+            cie=cie[0],
+            # marks=mark[1],
+            # attendance=mark[2],
+        )
+        st_mark = mark_tup[0]
+        st_mark.marks=mark[1]
+        st_mark.attendance=mark[2]
+        st_mark.save()
         
-        request.session["old_page"] = next_page             
-        return redirect("teacher_dashboard")
+    return redirect("message_page")
+    
+    
+def get_marks(request):
+    if request.method == 'POST':
+        usn = request.POST.get('usn')
+        cie = request.POST.get('cie')
+        sem = request.POST.get('sem')
+        
+        student = Student.objects.get(usn=usn)
+        semester = Semester.objects.get(sem=sem)
+        cie_obj = CIE.objects.filter(cie=cie, sem=semester)
+        print(cie_obj)
+        marks_obj = []
+        for cie in cie_obj:
+            marks = Marks.objects.get(student=student, cie=cie)
+            marks_obj.append(marks)
+            print(marks)
+        
+        return render(request, 'main/marks.html', {'marks_obj': marks_obj})
+    
+    return render(request, 'main/edit_marks.html')
+
+def update_marks(request, pk):
+    marks_obj = Marks.objects.filter(pk=pk)
+    # if request.method == 'POST':
+    #     marks_obj.marks = request.POST.get('marks')
+    #     marks_obj.attendance = request.POST.get('attendance')
+    #     marks_obj.save()
+    #     return redirect('get_marks')
+    if request.method == 'POST':
+        for obj in marks_obj:
+            obj.marks = request.POST.get('marks')
+            obj.attendance = request.POST.get('attendance')
+            obj.save()
+            return redirect('get_marks')
+    
+    
+    return render(request, 'main/update_marks.html', {'marks_obj': marks_obj})
+
+def view_marks(request):
+    if request.method == 'POST':
+        usn = request.POST.get('usn')
+        cie = request.POST.get('cie')
+        sem = request.POST.get('sem')
+        
+        student = Student.objects.get(usn=usn)
+        semester = Semester.objects.get(sem=sem)
+        cie_obj = CIE.objects.filter(cie=cie, sem=semester)
+        marks_obj = []
+        for cie in cie_obj:
+            try:
+                marks = Marks.objects.get(student=student, cie=cie)
+                marks_obj.append(marks)
+            except ObjectDoesNotExist as e:
+                print(e)
+               
+        return render(request, 'main/marks2.html', {'marks_obj': marks_obj})
+    
+    return render(request, 'main/view_marks.html')
+    
+# def view_marks2(request, pk):
+#     marks_obj = Marks.objects.get(pk=pk)
+#     return render(request, 'main/marks2.html', {'marks_obj': marks_obj})
+
+def student_dashboard(request):
+    if request.method == 'POST':
+        usn = request.POST.get('usn')
+        cie = request.POST.get('cie')
+        sem = request.POST.get('sem')
+        
+        student = Student.objects.get(usn=usn)
+        semester = Semester.objects.get(sem=sem)
+        cie_obj = CIE.objects.filter(cie=cie, sem=semester)
+        marks_obj = []
+        # for cie in cie_obj:
+        #     marks = Marks.objects.get(student=student, cie=cie)
+        #     ## make changes here use view marks
+        #     marks_obj.append(marks)
+        #     print(marks)
+        for cie in cie_obj:
+            try:
+                marks = Marks.objects.get(student=student, cie=cie)
+                marks_obj.append(marks)
+            except ObjectDoesNotExist as e:
+                print(e)
+            
+        if 'generate_pdf' in request.POST:
+             return render_to_pdf('main/progress_report_pdf.html', {'marks_obj': marks_obj})
+               
+        return render(request, 'main/student_view_marks.html', {'marks_obj': marks_obj})  
+    
+
+    return render(request, "main/student_dashboard.html")
+
+def is_user_in_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()
+
+def message_page(request):
+    user = request.user
+    is_teacher = is_user_in_group(user, 'Teachers')
+    is_student = is_user_in_group(user, 'Students')
+    data = {
+        'is_teacher': is_teacher,
+        'is_student': is_student,
+    }
+    return render(request, "main/message_page.html", data)
+
+
+
+        
+    

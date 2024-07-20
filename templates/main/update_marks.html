@@ -1,0 +1,34 @@
+{% include 'base.html' %}
+{% block content %}
+
+<div class="bg-white p-8 rounded-lg shadow-md max-w-lg mx-auto mt-8">
+    <h1 class="text-2xl font-bold mb-6 text-center">Update Marks</h1>
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {% for obj in marks_obj %}
+        <div class="grid grid-cols-1 gap-y-4">
+            <div>
+                <label for="sub_code" class="block text-sm font-medium text-gray-700">Subject Code:</label>
+                <input type="text" id="sub_code" name="sub_code" value="{{ obj.cie.sub_code }}" readonly
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500">
+            </div>
+            <div>
+                <label for="marks" class="block text-sm font-medium text-gray-700">Marks:</label>
+                <input type="text" id="marks" name="marks" value="{{ obj.marks }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="attendance" class="block text-sm font-medium text-gray-700">Attendance:</label>
+                <input type="text" id="attendance" name="attendance" value="{{ obj.attendance }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <div class="flex justify-center">
+            <input type="submit" value="Update"
+                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        </div>
+        {% endfor %}
+    </form>
+</div>
+
+{% endblock %}

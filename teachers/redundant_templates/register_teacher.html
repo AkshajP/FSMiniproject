@@ -1,8 +1,0 @@
-{% extends "_base.html" %}
-{% block content %}
-<h1>Register Teacher</h1>
-<form method="post" action="{% url 'register' %}">
-  {% csrf_token %} {{form.as_p}} 
-  <input type="submit" value="Register Teacher"> </form>
-</form>
-{% endblock %}

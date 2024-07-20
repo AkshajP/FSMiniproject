@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Teachers, Students, Marks, Subject
+from .models import Student,  Semester, CIE, Marks, TeacherDB
 
 # Register your models here.
-admin.site.register(Teachers)
-admin.site.register(Students)
+admin.site.register(Student)
+admin.site.register(Semester)
+admin.site.register(CIE)
 admin.site.register(Marks)
-admin.site.register(Subject)
+admin.site.register(TeacherDB)

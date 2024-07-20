@@ -1,35 +1,30 @@
-{% extends 'base.html' %}
-{% load static %}
-
+{% include 'base.html' %}
 {% block content %}
 
-<form method="post" action="{% url 'student_dashboard' %}">
-    {% csrf_token %}
-    
-    <b>USN</b><input type="text" id="usn" name="usn" value="{{ usn }}" readonly><br>   
-    <b>Sem</b><input type="number" id="sem" name="sem" value="{{ sem }}"><br>    
-    <b>CIE</b><input type="number" id="cie" name="cie" value="{{ cie }}"><br>
-    <input type="submit" value="Submit" class="button primary">
-    <button type="submit" name="generate_pdf">Generate PDF</button>
-</form>
-
-<h2>Report Details</h2>
-    <table border="1">
-        <tr>
-            <th>Sub Code</th>
-            <th>Subject Name</th>            
-            <th>Marks</th>
-            <th>Attendance</th>
-        </tr>
-        {% for sub_code, name, mark, attendance, _ in reports %}
-        <tr>
-            <td>{{ sub_code }}</td>
-            <td>{{ name }}</td>
-            <td>{{ mark }}</td>
-            <td>{{ attendance }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
+<div class="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto mt-8">
+    <h1 class="text-2xl font-bold mb-6 text-center">Get Marks</h1>
+    <form method="post" action="{% url 'view_marks' %}" class="space-y-6">
+        {% csrf_token %}
+        <div>
+            <label for="usn" class="block text-sm font-medium text-gray-700">USN:</label>
+            <input type="text" id="usn" name="usn" 
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+            <label for="cie" class="block text-sm font-medium text-gray-700">CIE Number:</label>
+            <input type="text" id="cie" name="cie" 
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+            <label for="sem" class="block text-sm font-medium text-gray-700">Semester:</label>
+            <input type="text" id="sem" name="sem" 
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div class="flex justify-center">
+            <input type="submit" value="Get Marks" 
+                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        </div>
+    </form>
+</div>
 
 {% endblock %}

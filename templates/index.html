@@ -1,0 +1,23 @@
+{% include 'base.html' %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold">This is the home page</h1>
+    <br>
+    {% if user.is_authenticated %}
+        <p class="text-lg">Hello, {{ user.first_name }}</p>
+        <a href="{% url 'logout' %}" class="text-blue-500 hover:text-blue-700">Logout</a>
+        <br>
+    {% else %}
+        <div class="mt-4 p-4 border border-gray-300 rounded-lg shadow-sm">
+            <label for="button" class="block text-xl font-semibold mb-2">Registration</label>
+            <p class="text-lg mb-4">Are you Student or Teacher?</p>
+            <div class="flex space-x-4">
+                <a href="{% url 'teacher_register' %}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Teacher</a>
+                <a href="{% url 'student_register' %}" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700">Student</a>
+                <a href="{% url 'login' %}"  class="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-700">Login</a>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+</div>
+{% endblock %}
