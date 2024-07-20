@@ -1,0 +1,43 @@
+{% include 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white border border-gray-300 rounded-lg shadow-md">
+    <form action="{% url 'edit_marks_page2' %}" method="post" class="space-y-4">
+        {% csrf_token %}
+        <input name="cie" value="{{ cie }}" hidden>
+        <input name="sem" value="{{ sem }}" hidden>
+        <input name="sub_code" value="{{ sub_code }}" hidden>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">USN</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marks</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for student_full, student_half in students %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ student_full.first_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ student_half.usn }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="number" name="marks-{{ student_half.id }}" placeholder="{{ student_half.marks }}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="text" name="attendance-{{ student_half.id }}" placeholder="{{ student_half.attendance }}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <input type="submit" value="Submit" class="w-full py-2 px-4 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        </div>
+    </form>
+</div>
+{% endblock %}

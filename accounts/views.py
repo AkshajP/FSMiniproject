@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth, Group
-from updated.models import TeacherDB, Student
+from main.models import TeacherDB, Student
 # Create your views here.
 
 def is_user_in_group(user, group_name):

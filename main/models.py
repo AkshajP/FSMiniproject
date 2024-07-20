@@ -1,37 +1,42 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
-class Teachers(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=254)    
+class Student(models.Model):
+    student = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    class_code = models.CharField(max_length=100)
+    usn = models.CharField(max_length=100)
     
-    def __str__(self):
-        return self.name
-    
-class Students(models.Model):
-    usn = models.CharField(max_length = 10)    
-    name = models.CharField(max_length = 100)
-    email = models.EmailField(max_length=254)
-    counsellor = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name="counsellor")
-    
-    def __str__(self):
-        return self.name
-    
-class Subject(models.Model):
+    def __str__(self) -> str:
+        return self.student.first_name
+
+class Semester(models.Model):
     sem = models.IntegerField()
-    sub_code = models.CharField(max_length=15)
-    sub_name = models.CharField(max_length=100)
     
-    def __str__(self):
-        return self.sub_name
+    def __str__(self) -> str:
+        return f"{self.sem}"
+
+class CIE(models.Model):
+    sem = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    cie = models.IntegerField()
+    sub_code = models.CharField(max_length=100)
+    
+    def __str__(self) -> str:
+        return f"{self.cie}"
     
 class Marks(models.Model):
-    sub_code = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="subject_code")
-    cie = models.IntegerField()
-    usn = models.ForeignKey(Students, on_delete=models.CASCADE, related_name="student_usn")
-    marks = models.DecimalField(max_digits=4, decimal_places=2)
-    attendance = models.CharField(max_length=10)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    cie = models.ForeignKey(CIE, on_delete=models.CASCADE)
+    marks = models.IntegerField(null=True)
+    attendance = models.CharField(max_length=50, null=True)
+    
+    def __str__(self) -> str:
+        return f"{self.marks}"
+    
+class TeacherDB(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
     
     def __str__(self):
-        return f"Student: {self.usn.usn}, Subject: {self.sub_code.sub_name}, Marks: {self.marks}"
+        return self.name
