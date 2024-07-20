@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<br>  
+    
+    <a href="{% url 'add_marks' %}">Add Marks</a><br>
+    <a href="{% url 'view_marks' %}">View Marks of a student</a><br>
+    <a href="{% url 'get_marks' %}">Edit a student's marks</a><br>       
+    
+</form>
+{% endblock %}
+
+

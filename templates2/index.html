@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<br>
+This is the home page
+<br>
+{% if user.is_authenticated %}
+Hello, {{ user.first_name }}
+<a href="{% url 'logout' %}">Logout</a><br>
+{% else %}
+<div>
+    <label for="button">Registeration</label>
+    <p>Are you Student or Teacher?</p>
+    <a href="{% url 'teacher_register' %}" class="button">Teacher</a>
+    <a href="{% url 'student_register' %}" class="button">Student</a>
+</div><br>
+
+{% endif %}
+
+{% endblock %}

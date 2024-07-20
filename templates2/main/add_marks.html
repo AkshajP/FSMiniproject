@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<br>
+<form action="{% url 'add_marks' %}" method="POST">
+    {% csrf_token %}
+    <label for="sem">Select Semester:</label>
+        <select name="sem" id="sem_no">
+            <option value="" disabled selected hidden>Choose Option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <br>
+        </select>
+    <br><br>
+    <label for="cie_no">Enter CIE:</label>
+        <select name="cie" id="cie_no">
+            <option value="" disabled selected hidden>Choose Option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <br>
+        </select>
+    <br><br>
+    <label for="class_code">Enter Class Code:</label>
+    <br><br>
+    <input type="text" name="class_code" placeholder="Ex. ">
+    <br><br>
+    <label for="sub_code">Enter Subject Code:</label>
+    <br><br>
+    <input type="text" name="sub_code" placeholder="">
+    <br><br>
+    <input type="submit">
+</form>
+
+{% endblock %}

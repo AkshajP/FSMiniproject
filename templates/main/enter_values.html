@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h2>Report Details</h2>
+<form method = "POST" action="{% url 'save_marks_n_attd' %}">
+    {% csrf_token %}
+    <table border="1">
+        <tr>
+            <th>Sub Code</th>
+            <th>Subject Name</th>            
+            <th>Marks</th>
+            <th>Attendance</th>
+        </tr>
+        {% for sub in subject_list %}
+        <tr>
+            <td>{{ sub.sub_code }}</td>
+            <td>{{ sub.sub_name }}</td>
+            <td><input type="number" name="marks_{{ sub.id }}"></td>
+            <td><input type="text" name="attendance_{{ subject.id }}" ></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button type="submit">Save</button>
+</form>
+
+
+{% endblock %}
