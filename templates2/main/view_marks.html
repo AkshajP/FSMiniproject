@@ -1,0 +1,17 @@
+{% include 'base.html' %}
+{% block content %}
+<div>
+    <h1>Get Marks</h1>
+    <form method="post" action="{% url 'view_marks' %}">
+        {% csrf_token %}
+        <label for="usn">USN:</label>
+        <input type="text" id="usn" name="usn"><br><br>
+        <label for="cie">CIE Number:</label>
+        <input type="text" id="cie" name="cie"><br><br>
+        <label for="sem">Semester:</label>
+        <input type="text" id="sem" name="sem"><br><br>
+        <input type="submit" value="Get Marks">
+    </form>
+
+</div>
+{% endblock %}

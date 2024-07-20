@@ -23,8 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
+    'main', 'accounts',
     'compressor',
+    'updated',
 ]
 
 MIDDLEWARE = [
@@ -42,7 +43,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [join(BASE_DIR, "templates")],
+        'DIRS': [join(BASE_DIR, "templates2")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,13 +100,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = 'static2/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    # BASE_DIR / "static",
+    join(BASE_DIR, 'static2')
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = join(BASE_DIR, 'assets')
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Compressor settings
 COMPRESS_ROOT = BASE_DIR / 'static'
